@@ -1,11 +1,16 @@
 
 import './App.css'
+import Header from './Component/Header/Header.jsx'
+import Footer from './Component/Footer/Footer.jsx'
+import Home from './Component/Home/Home.jsx'
 
 function App() {
-
+  
   return (
     <>
-      <p>Project</p>
+      <Header/>
+      <Home/>
+      <Footer/>
     </>
   )
 }
