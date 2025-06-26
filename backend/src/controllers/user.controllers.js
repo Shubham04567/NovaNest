@@ -82,7 +82,14 @@ const loginUser = async(req, res, next) =>{
     // console.log(user)
     const token = await generate_accessToken(user.rows[0].user_id);
 
-    return res.status(200).json({
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res.status(200)
+        .cookie("accessToken", token, options)
+        .json({
         status:200,
         success:true,
         data:token,
@@ -90,7 +97,31 @@ const loginUser = async(req, res, next) =>{
     })
 }
 
+const logoutUser = async(req,res,next)=>{
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken",options)
+    .json({
+        status:200,
+        success:true,
+        message:"User logout successfully"
+    })
+}
+
 export {
     registerUser,
-    loginUser
+    loginUser,
+    logoutUser
 }
+
+    // Yes — if someone stores your access token and reuses it after logout, and your backend only checks if it's valid (not expired), it will work unless you:
+    // because jwt are state less , it decode accesstoken and return protected data untill it expire
+
+    // Use a blocklist store (all expired accesstoken and check on each request)
+    // Tie JWT to a server-side session (use session to store and store in payload and check is session is valid or not)
+    // Keep access tokens short-lived
