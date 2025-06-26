@@ -4,7 +4,7 @@ import { decode_accessToken } from "../utils/helper.js"
 
 const verifyJWT = async(req,res,next) =>{
     try {
-
+        console.log("middleware", req.cookies)
         const atoken = req.cookies?.accessToken || req.header
         ("Authorization")?.replace("Bearer ","")
     

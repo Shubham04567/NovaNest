@@ -4,7 +4,7 @@ import {connectdb,pool} from "../db/index.js"
 import { generate_accessToken } from "../utils/helper.js"
 
 const registerUser = async (req, res, next) => {
-    
+    console.log(req.body)
     const {first_name, last_name, email, password, profile_pic="--"} = req.body
 
     //validation for required feild
@@ -102,7 +102,7 @@ const logoutUser = async(req,res,next)=>{
         httpOnly: true,
         secure: true
     }
-
+    console.log(res)
     return res
     .status(200)
     .clearCookie("accessToken",options)
