@@ -1,9 +1,44 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import UserContext from '../../Context/UseContext.js';
 
 const Dashboard = () => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const navigate= useNavigate()
+    const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
-    
+    const {user, setUser} = useContext(UserContext)
+
+
+    const handleloginbtn = ()=>{
+        navigate("/login")
+    }
+
+    const handeLogout = async() => {
+        try {
+
+            const response = await fetch("http://localhost:8000/api/v1/users/logout",{
+                method: "POST",
+                headers: {
+                    "Content-type":"Application/json"
+                    },
+                credentials: "include"
+            })
+
+            const result = await response.json()
+
+            if(result && result.success===true){
+                setUser(null)
+            }
+            else{
+                console.log("log out unsuccessfull")
+            }
+            
+        } catch (error) {
+            console.log(error)
+        }
+        
+    }
 
     return (
         <nav className="bg-gray-700 text-white px-6 py-1.5">
@@ -46,9 +81,39 @@ const Dashboard = () => {
                         alt="Toggle"
                         className="w-6 h-6 cursor-pointer"
                     />
-                    <button className="bg-white text-violet-700 px-4 py-1 rounded-full font-semibold hover:bg-yellow-400">
-                        Login
-                    </button>
+                    {user ? (
+                        <div className="relative">
+                            <img
+                                src="https://img.icons8.com/ios-filled/30/ffffff/user-male-circle.png"
+                                alt="User"
+                                className="w-8 h-8 rounded-full cursor-pointer"
+                                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                            />
+                            {userDropdownOpen && (
+                                <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-md shadow-lg z-50">
+                                    <button
+                                        onClick={() => navigate("/profile")}
+                                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                    >
+                                    View Profile
+                                    </button>
+                                    <button
+                                    onClick={handeLogout}
+                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                                    >
+                                    Logout
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        ) : (
+                        <button
+                            onClick={handleloginbtn}
+                            className="bg-white text-violet-700 px-4 py-1 rounded-full font-semibold hover:bg-yellow-400"
+                        >
+                            Login
+                        </button>
+                        )}
 
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
