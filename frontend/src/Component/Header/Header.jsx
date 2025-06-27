@@ -7,14 +7,13 @@ const Dashboard = () => {
     const navigate= useNavigate()
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
-    const {user, setUser} = useContext(UserContext)
-
+    const {user, setUser, userEmail} = useContext(UserContext)
 
     const handleloginbtn = ()=>{
         navigate("/login")
     }
 
-    const handeLogout = async() => {
+    const handleLogout = async() => {
         try {
 
             const response = await fetch("http://localhost:8000/api/v1/users/logout",{
@@ -29,6 +28,7 @@ const Dashboard = () => {
 
             if(result && result.success===true){
                 setUser(null)
+                navigate("/home")
             }
             else{
                 console.log("log out unsuccessfull")
@@ -38,6 +38,31 @@ const Dashboard = () => {
             console.log(error)
         }
         
+    }
+
+    const getProfileInfo = async()=>{
+        try {
+            const response = await fetch("http://localhost:8000/api/v1/users/whoami",{
+              method: "POST",
+              headers:{
+                "Content-type": "Application/json"
+              },
+              credentials: "include"
+            })
+
+            const result = await response.json()
+
+            if(result && result.success){
+                // console.log(result.data)
+                // setUserInfo(result.data) : it not update immeidiatly
+                navigate("/profile", { state: { userInfo: result.data } })
+            }
+            else{
+                console.log("Unable to fetch user profile data")
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
@@ -89,21 +114,87 @@ const Dashboard = () => {
                                 className="w-8 h-8 rounded-full cursor-pointer"
                                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                             />
-                            {userDropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-md shadow-lg z-50">
-                                    <button
-                                        onClick={() => navigate("/profile")}
-                                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                                    >
-                                    View Profile
-                                    </button>
-                                    <button
-                                    onClick={handeLogout}
-                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                                    >
-                                    Logout
-                                    </button>
+                           {userDropdownOpen && (
+                            <div 
+                                className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden"
+                                role="menu"
+                                aria-orientation="vertical"
+                                aria-labelledby="user-menu-button"
+                            >
+                                {/* User info section (optional) */}
+                                <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                                    <p className="text-sm font-medium text-gray-900">{user}</p>
+                                    <p className="text-xs text-gray-500 truncate">{userEmail}</p>
                                 </div>
+
+                                {/* Navigation items */}
+                                <div className="py-1">
+                                <button
+                                    onClick={() => {
+                                        setUserDropdownOpen(false);
+                                        getProfileInfo()
+                                        
+                                    }}
+                                    className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150"
+                                    role="menuitem"
+                                >
+                                    <svg className="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    View Profile
+                                </button>
+                                
+                                <button
+                                    // onClick={() => navigate("/saved")}
+                                    className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150"
+                                    role="menuitem"
+                                >
+                                    <svg className="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                    </svg>
+                                    Saved Items
+                                </button>
+                                
+                                <button
+                                    // onClick={() => navigate("/my-posts")}
+                                    className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150"
+                                    role="menuitem"
+                                >
+                                    <svg className="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    Your Posts
+                                </button>
+                                
+                                <button
+                                    // onClick={() => navigate("/following")}
+                                    className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150"
+                                    role="menuitem"
+                                >
+                                    <svg className="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    Following
+                                </button>
+                                </div>
+
+                                {/* Separator */}
+                                <div className="border-t border-gray-100"></div>
+
+                                {/* Logout section */}
+                                <div className="py-1">
+                                <button
+                                    onClick={handleLogout}
+                                    className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors duration-150"
+                                    role="menuitem"
+                                >
+                                    <svg className="w-4 h-4 mr-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                    Sign Out
+                                </button>
+                                </div>
+                            </div>
                             )}
                         </div>
                         ) : (

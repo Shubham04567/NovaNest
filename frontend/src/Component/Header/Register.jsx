@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import UserContext from "../../Context/UseContext.js";
 
 const Register = () => {
@@ -7,8 +7,13 @@ const Register = () => {
   const [last_name, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [bio, setBio] = useState("");
+  const [role, setRole] = useState("")
   const [profile_pic, setProfilePic] = useState("");
+  const [address, setAddress] = useState("")
 
+  const navigate = useNavigate()
 
   const handleRegiser = async()=>{
     try {
@@ -17,15 +22,20 @@ const Register = () => {
           headers: {
                       "Content-type": "Application/json"
                   },          
-          body: JSON.stringify({first_name,last_name,email,password,profile_pic})
+          body: JSON.stringify({first_name,last_name,email,password,phone,profile_pic,role,bio,address})
       })
       const result = await response.json()
       console.log(result)
+      if(result && result.success===true){
+        navigate('/login')
+      }
 
     } catch (error) {
       console.log("error",error)
     }
   }
+
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,6 +84,36 @@ const Register = () => {
               />
             </div>
 
+             <div>
+              <label className="block text-sm font-medium text-gray-700">Phone</label>
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full border border-gray-300 rounded px-4 py-1.5 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">bio</label>
+              <input
+                type="text"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                className="w-full border border-gray-300 rounded px-4 py-1.5 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Proffession</label>
+              <input
+                type="text"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full border border-gray-300 rounded px-4 py-1.5 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700">Password</label>
               <input
@@ -93,6 +133,18 @@ const Register = () => {
                 onChange={(e) => setProfilePic(e.target.value)}
                 placeholder="Optional"
                 className="w-full border border-gray-300 rounded px-4 py-1.5 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Address</label>
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder=""
+                className="w-full border border-gray-300 rounded px-4 py-1.5 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
               />
             </div>
 

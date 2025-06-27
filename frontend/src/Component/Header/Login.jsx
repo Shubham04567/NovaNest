@@ -1,6 +1,6 @@
 
 import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import UserContext from "../../Context/UseContext";
 
 const Login = () => {
@@ -8,7 +8,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const {setUser} = useContext(UserContext)
+  const {setUser, setUserEmail} = useContext(UserContext)
+  const navigate = useNavigate()
 
   const handleLogin = async()=>{
     console.log("oooo")
@@ -23,9 +24,12 @@ const Login = () => {
 
     const result = await res.json()
 
-    console.log(result.status)
+    console.log(result)
+    // console.log(result.data[1]+" "+result.data[2])
     if(result && result.success===true){
-      setUser(email)
+      setUserEmail(email)
+      setUser(result.data[1]+" "+result.data[2])
+      navigate("/home")
     }
 
   }

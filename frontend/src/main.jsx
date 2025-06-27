@@ -5,6 +5,7 @@ import Layout from './Layout.jsx'
 import Home from './Component/Home/Home.jsx'
 import Login from './Component/Header/Login.jsx'
 import Register from "./Component/Header/Register.jsx"
+import Profile from "./Component/Header/Profile.jsx"
 import './index.css'
 import App from './App.jsx'
 
@@ -25,7 +26,16 @@ const router = createBrowserRouter([
       {
         path:"/register",
         element: <Register/>
+      },
+      {
+        path:"/home",
+        element: <Home/>
+      },
+      {
+        path:"/profile",
+        element: <Profile/>
       }
+
     ]
   }
 ])
