@@ -5,10 +5,10 @@ import { generate_accessToken } from "../utils/helper.js"
 
 const registerUser = async (req, res, next) => {
     console.log(req.body)
-    const {first_name, last_name, email, password, profile_pic="--"} = req.body
+    const {first_name,last_name,email,password,phone="",profile_pic="",role="",bio="",address} = req.body
 
     //validation for required feild
-    if(!first_name || !last_name || !email || !password){
+    if(!first_name || !last_name || !email || !password || !address){
         return res.status(401).json({
             status: 401,
             success: false,
@@ -32,8 +32,8 @@ const registerUser = async (req, res, next) => {
 
     //insert in db
     await pool.query(
-        "INSERT INTO users (first_name, last_name, email, password, profile_pic) VALUES($1, $2, $3, $4, $5)",
-        [first_name, last_name, email, hashpass, profile_pic]
+        "INSERT INTO users (first_name,last_name,email,password,phone,profile_pic,role,bio,address) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+        [first_name,last_name,email,hashpass,phone,profile_pic,role,bio,address]
     );
 
     return res.status(200).json({
@@ -79,7 +79,7 @@ const loginUser = async(req, res, next) =>{
             message:"invalid login credentials"
         })
     }
-    // console.log(user)
+    console.log(user)
     const token = await generate_accessToken(user.rows[0].user_id);
 
     const options = {
@@ -92,7 +92,7 @@ const loginUser = async(req, res, next) =>{
         .json({
         status:200,
         success:true,
-        data:token,
+        data:[token,user.rows[0].first_name, user.rows[0].last_name],
         message: "user get logged in successfully"
     })
 }
@@ -113,10 +113,53 @@ const logoutUser = async(req,res,next)=>{
     })
 }
 
+const whoami = async(req,res,next) => {
+    const user_id = req.id;
+    if(!user_id){
+        return res.status(401).json({
+            status:401,
+            success: false,
+            message: "Invalid access"
+        })
+    }
+
+    const result = await pool.query("SELECT * from users WHERE user_id = $1",[user_id])
+
+    if(!result){
+        return res.status(404).json({
+            status:404,
+            success: false,
+            message: "User Not found"
+        })
+    }
+
+    const user = result.rows[0];
+
+    const userInfo = {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        phone: user.phone,
+        bio: user.bio,
+        role: user.role,
+        profile_pic: user.profile_pic,
+        address: user.address
+    };
+
+
+    return res.status(200).json({
+        status: true,
+        success: true,
+        data:userInfo,
+        message:"data fetched successfully"
+    })
+}
+
 export {
     registerUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    whoami
 }
 
     // Yes — if someone stores your access token and reuses it after logout, and your backend only checks if it's valid (not expired), it will work unless you:
